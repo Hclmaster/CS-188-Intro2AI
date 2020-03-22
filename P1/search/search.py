@@ -177,7 +177,7 @@ def breadthFirstSearch(problem):
             print("******This state doesn't store in dictionary!******")
             break
         state = prev_nodes[goal_node]
-        if state == problem.getStartState():
+        if type(problem.getStartState()) == type(state) and state == problem.getStartState():
             break
         if state is not None:
             actions.append(state[1])
