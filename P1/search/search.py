@@ -19,6 +19,7 @@ Pacman agents (in searchAgents.py).
 
 import util
 
+
 class SearchProblem:
     """
     This class outlines the structure of a search problem, but doesn't implement
@@ -70,7 +71,8 @@ def tinyMazeSearch(problem):
     from game import Directions
     s = Directions.SOUTH
     w = Directions.WEST
-    return  [s, s, w, s, w, w, s, w]
+    return [s, s, w, s, w, w, s, w]
+
 
 def depthFirstSearch(problem):
     """
@@ -87,21 +89,64 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
-    print("Start:", problem.getStartState())
-    print("Is the start a goal?", problem.isGoalState(problem.getStartState()))
-    print("Start's successors:", problem.getSuccessors(problem.getStartState()))
 
-    util.raiseNotDefined()
+    stack = util.Stack()
+    prev_stacks = util.Stack()
+    closed_set = set()
+    closed_set.add(problem.getStartState())
+
+    for successor in problem.getSuccessors(problem.getStartState()):
+        stack.push(successor)
+        prev_stacks.push(successor)
+
+    actions = []
+
+    while not stack.isEmpty():
+        state = stack.pop()
+        prev_top = prev_stacks.pop()
+        if prev_top[0] == state[0]:
+            prev_stacks.push(prev_top)
+        else:
+            while prev_top[0] != state[0]:
+                prev_top = prev_stacks.pop()
+                actions.pop()
+            prev_stacks.push(state[0])
+
+        # if not visited before, then visit, otherwise continue
+        if state[0] in closed_set:
+            continue
+        if state[0] not in closed_set:
+            actions.append(state[1])
+            closed_set.add(state[0])
+        if problem.isGoalState(state[0]):
+            break
+
+        successors = problem.getSuccessors(state[0])
+        flag = False
+        for successor in successors:
+            if successor[0] in closed_set:
+                continue
+            stack.push(successor)
+            prev_stacks.push(successor)
+            flag = True
+        if not flag:
+            actions.pop()
+            prev_stacks.pop()
+
+    return actions
+
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
     util.raiseNotDefined()
 
+
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
     util.raiseNotDefined()
+
 
 def nullHeuristic(state, problem=None):
     """
@@ -109,6 +154,7 @@ def nullHeuristic(state, problem=None):
     goal in the provided SearchProblem.  This heuristic is trivial.
     """
     return 0
+
 
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
