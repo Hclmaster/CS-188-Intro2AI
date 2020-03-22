@@ -139,7 +139,55 @@ def depthFirstSearch(problem):
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    queue = util.Queue()
+    closed_set = set()
+    closed_set.add(problem.getStartState())
+    prev_nodes = {problem.getStartState(): None}
+
+    # be careful about the definition of closed set here
+    # it should judge whether this node is current inside queue or not
+    # not judge whether this node is expanded or not
+    # because the way bfs works - is start from shallow and then deeper
+    # so if this node is being visited in shallow before, then we no need
+    # to expand this node, thus we can mark it already being inside queue.
+    for successor in problem.getSuccessors(problem.getStartState()):
+        queue.push(successor)
+        prev_nodes[successor[0]] = problem.getStartState()
+        closed_set.add(successor[0])
+
+    goal_node = None
+    actions = []
+
+    while not queue.isEmpty():
+        state = queue.pop()
+
+        if problem.isGoalState(state[0]):
+            goal_node = state[0]
+            actions.append(state[1])
+            break
+
+        for successor in problem.getSuccessors(state[0]):
+            if successor[0] not in closed_set:
+                prev_nodes[successor[0]] = state
+                queue.push(successor)
+                closed_set.add(successor[0])
+
+    while goal_node:
+        if goal_node not in prev_nodes:
+            print("******This state doesn't store in dictionary!******")
+            break
+        state = prev_nodes[goal_node]
+        if state == problem.getStartState():
+            break
+        if state is not None:
+            actions.append(state[1])
+            goal_node = state[0]
+        else:
+            goal_node = state
+
+    # print("actions: \n", actions)
+    actions.reverse()
+    return actions
 
 
 def uniformCostSearch(problem):
