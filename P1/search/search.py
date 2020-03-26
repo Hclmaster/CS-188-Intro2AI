@@ -185,7 +185,6 @@ def breadthFirstSearch(problem):
         else:
             goal_node = state
 
-    # print("actions: \n", actions)
     actions.reverse()
     return actions
 

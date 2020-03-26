@@ -288,6 +288,9 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
+        self.cornersTouched = set()
+        # ('self.corners: ', ((1, 1), (1, 6), (6, 1), (6, 6)))
+
 
     def getStartState(self):
         """
@@ -295,14 +298,23 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # Solved ideas after referring to others
+        # Current state will as designed as follows:
+        # ((1, 6), corner1_boolean, corner2_boolean, corner3_boolean, corner4_boolean)
+        # Because in this way, bfs can "return" from the dead end and move forward!
+        return (self.startingPosition, False, False, False, False)
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        corners_state = state[1:]
+        for corner_state in corners_state:
+            if not corner_state:
+                return False
+
+        return True
 
     def getSuccessors(self, state):
         """
@@ -314,6 +326,9 @@ class CornersProblem(search.SearchProblem):
             state, 'action' is the action required to get there, and 'stepCost'
             is the incremental cost of expanding to that successor
         """
+        # Current state will as designed as follows:
+        # ((1, 6), False, True, True, True)
+        # Because in this way, bfs can "return" from the dead end and move forward!
 
         successors = []
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
@@ -325,7 +340,22 @@ class CornersProblem(search.SearchProblem):
             #   hitsWall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
+            x,y = state[0]
+            dx, dy = Actions.directionToVector(action)
+            nextx, nexty = int(x + dx), int(y + dy)
+            hitsWall = self.walls[nextx][nexty]
+            if hitsWall:
+                continue
 
+            new_state = [(nextx, nexty), state[1], state[2], state[3], state[4]]
+            for i, corner in enumerate(self.corners):
+                corner_x, corner_y = corner
+                if nextx == corner_x and nexty == corner_y:
+                    new_state[i+1] = True
+
+            # Change the state boolean value if we reached one of the corners!
+            successors.append(( tuple(new_state), action, 1))
+        
         self._expanded += 1 # DO NOT CHANGE
         return successors
 
